@@ -1,7 +1,12 @@
-package main
+/**
+ * Client Package
+ *
+ * Provides standard connection to Datasift API
+ */
+
+package datasift
 
 import (
-    "flag"
     "io/ioutil"
     "log"
     "net/http"
@@ -13,13 +18,7 @@ const (
     API_VERSION = "v1"
 )
 
-// Note: returns pointers
-var user = flag.String("user", "", "Your datasift user name")
-var key = flag.String("key", "", "Your datasift api key")
-
-func main() {
-
-    flag.Parse()
+func Client(user *string, key *string) string {
 
     parts := []string{API, API_VERSION, "push", "get"}
     endpoint := strings.Join(parts, "/")
@@ -47,6 +46,6 @@ func main() {
         log.Fatal(err)
     }
 
-    log.Printf("%v", string(body[:]))
+    return string(body[:])
 
 }
