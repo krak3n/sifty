@@ -14,23 +14,37 @@ import (
 )
 
 const (
-    API         = "https://api.datasift.com"
+    API_ROOT    = "https://api.datasift.com"
     API_VERSION = "v1"
 )
 
-func Client(user *string, key *string) string {
+type Credentials struct {
+    User string
+    Key  string
+}
 
-    parts := []string{API, API_VERSION, "push", "get"}
-    endpoint := strings.Join(parts, "/")
+func BuildEndpoint(parts []string) string {
+    base := []string{
+        API_ROOT,
+        API_VERSION,
+    }
+    parts = append(base, parts...)
+    return strings.Join(parts, "/")
+}
+
+func Query(credentials *Credentials, url string) string {
+
+    log.Println(credentials)
+    log.Println(url)
 
     client := &http.Client{}
-    req, err := http.NewRequest("GET", endpoint, nil)
+    req, err := http.NewRequest("GET", url, nil)
 
     if err != nil {
         log.Fatal(err)
     }
 
-    req.Header.Add("Authorization", strings.Join([]string{*user, *key}, ":"))
+    req.Header.Add("Authorization", strings.Join([]string{credentials.User, credentials.Key}, ":"))
 
     resp, err := client.Do(req)
 

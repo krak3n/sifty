@@ -20,8 +20,16 @@ func main() {
 
     flag.Parse()
 
-    subscriptions := datasift.Client(user, key)
+    // API Endpoint
+    endpoint := []string{"push", "get"}
 
-    log.Printf(subscriptions)
+    // Pointer to credentials
+    credentials := new(datasift.Credentials)
+    (*credentials).User = *user
+    (*credentials).Key = *key
+
+    query := datasift.Query(credentials, datasift.BuildEndpoint(endpoint))
+
+    log.Printf(query)
 
 }
