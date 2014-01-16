@@ -9,11 +9,11 @@ package datasift
 import "testing"
 
 func TestAuthorizationHeaderValue(t *testing.T) {
-    credentials := &Credentials{
+    client := &Client{
         "foo",
         "bar",
     }
-    value := credentials.authorizationHeaderValue()
+    value := client.authorizationHeaderValue()
     if value != "foo:bar" {
         t.Errorf("Expected foo:bar, got %v", value)
     }

@@ -27,12 +27,12 @@ func BuildEndpoint(parts []string) string {
     return strings.Join(parts, "/")
 }
 
-type Credentials struct {
+type Client struct {
     User string
     Key  string
 }
 
-func (c Credentials) authorizationHeaderValue() (value string) {
+func (c Client) authorizationHeaderValue() (value string) {
     credentials := []string{
         c.User,
         c.Key,
@@ -40,7 +40,7 @@ func (c Credentials) authorizationHeaderValue() (value string) {
     return strings.Join(credentials, ":")
 }
 
-func (c Credentials) addHttpHeaders(request *http.Request) *http.Request {
+func (c Client) addHttpHeaders(request *http.Request) *http.Request {
     headers := make(map[string]string)
     headers["Authorization"] = c.authorizationHeaderValue()
     for key, value := range headers {
@@ -49,7 +49,7 @@ func (c Credentials) addHttpHeaders(request *http.Request) *http.Request {
     return request
 }
 
-func (c Credentials) request(url string) *http.Response {
+func (c Client) request(url string) *http.Response {
     client := &http.Client{}
     request, err := http.NewRequest("GET", url, nil)
     if err != nil {
@@ -63,7 +63,7 @@ func (c Credentials) request(url string) *http.Response {
     return response
 }
 
-func Query(c *Credentials, url string) string {
+func Query(c *Client, url string) string {
     response := c.request(url)
     defer response.Body.Close()
     body, err := ioutil.ReadAll(response.Body)

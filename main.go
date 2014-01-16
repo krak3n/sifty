@@ -24,9 +24,9 @@ func main() {
     endpoint := []string{"push", "get"}
 
     // Pointer to credentials
-    credentials := new(datasift.Credentials)
-    (*credentials).User = *user
-    (*credentials).Key = *key
+    client := new(datasift.Client)
+    (*client).User = *user
+    (*client).Key = *key
 
     query := datasift.Query(credentials, datasift.BuildEndpoint(endpoint))
 
