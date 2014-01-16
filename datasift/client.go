@@ -63,8 +63,9 @@ func (c Client) request(url string) *http.Response {
     return response
 }
 
-func Query(c *Client, url string) string {
-    response := c.request(url)
+func (c Client) Query(parts []string) string {
+    endpoint := c.makeEndpoint(parts)
+    response := c.request(endpoint)
     defer response.Body.Close()
     body, err := ioutil.ReadAll(response.Body)
     if err != nil {
