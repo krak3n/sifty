@@ -1,5 +1,5 @@
 /**
- * Client Package
+ * Datasift Package
  *
  * Provides standard connection to Datasift API
  */
