@@ -3,7 +3,12 @@ language: go
 go:
   - 1.2
 
-script: go test -v ./...
+install:
+  go get github.com/mattn/goveralls
+  go get github.com/axw/gocov/gocov
+  go get code.google.com/p/go.tools/cmd/cover
+
+script: go test -v ./... -cover
 
 notifications:
   email: false
