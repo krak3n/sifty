@@ -1,5 +1,7 @@
 # Sifty
 
+[![Build Status](https://travis-ci.org/krak3n/sifty.png?branch=master)](https://travis-ci.org/krak3n/sifty)
+
 Sifty (name may change) is and will be eventually a Go library for interacting with the Datasift REST API
 
 This is an experimental / learning project so I can learn Go so not recomended for use in production :p
