@@ -18,11 +18,6 @@ const (
     API_VERSION = "v1"
 )
 
-type Credentials struct {
-    User string
-    Key  string
-}
-
 func BuildEndpoint(parts []string) string {
     base := []string{
         API_ROOT,
@@ -32,34 +27,48 @@ func BuildEndpoint(parts []string) string {
     return strings.Join(parts, "/")
 }
 
-func Query(credentials *Credentials, url string) string {
+type Credentials struct {
+    User string
+    Key  string
+}
 
-    log.Println(credentials)
-    log.Println(url)
+func (c Credentials) authorizationHeaderValue() (value string) {
+    credentials := []string{
+        c.User,
+        c.Key,
+    }
+    return strings.Join(credentials, ":")
+}
 
+func (c Credentials) addHttpHeaders(request *http.Request) *http.Request {
+    headers := make(map[string]string)
+    headers["Authorization"] = c.authorizationHeaderValue()
+    for key, value := range headers {
+        request.Header.Add(key, value)
+    }
+    return request
+}
+
+func (c Credentials) request(url string) *http.Response {
     client := &http.Client{}
-    req, err := http.NewRequest("GET", url, nil)
-
+    request, err := http.NewRequest("GET", url, nil)
     if err != nil {
         log.Fatal(err)
     }
-
-    req.Header.Add("Authorization", strings.Join([]string{credentials.User, credentials.Key}, ":"))
-
-    resp, err := client.Do(req)
-
+    request = c.addHttpHeaders(request)
+    response, err := client.Do(request)
     if err != nil {
         log.Fatal(err)
     }
+    return response
+}
 
-    defer resp.Body.Close()
-
-    body, err := ioutil.ReadAll(resp.Body)
-
+func Query(c *Credentials, url string) string {
+    response := c.request(url)
+    defer response.Body.Close()
+    body, err := ioutil.ReadAll(response.Body)
     if err != nil {
         log.Fatal(err)
     }
-
     return string(body[:])
-
 }
