@@ -18,15 +18,6 @@ const (
     API_VERSION = "v1"
 )
 
-func BuildEndpoint(parts []string) string {
-    base := []string{
-        API_ROOT,
-        API_VERSION,
-    }
-    parts = append(base, parts...)
-    return strings.Join(parts, "/")
-}
-
 type Client struct {
     User string
     Key  string
@@ -47,6 +38,15 @@ func (c Client) addHttpHeaders(request *http.Request) *http.Request {
         request.Header.Add(key, value)
     }
     return request
+}
+
+func (c Client) makeEndpoint(parts []string) string {
+    base := []string{
+        API_ROOT,
+        API_VERSION,
+    }
+    parts = append(base, parts...)
+    return strings.Join(parts, "/")
 }
 
 func (c Client) request(url string) *http.Response {
