@@ -40,15 +40,6 @@ func (c Client) addHttpHeaders(request *http.Request) *http.Request {
     return request
 }
 
-func (c Client) makeEndpoint(parts []string) string {
-    base := []string{
-        API_ROOT,
-        API_VERSION,
-    }
-    parts = append(base, parts...)
-    return strings.Join(parts, "/")
-}
-
 func (c Client) request(url string) *http.Response {
     client := &http.Client{}
     request, err := http.NewRequest("GET", url, nil)
@@ -61,6 +52,15 @@ func (c Client) request(url string) *http.Response {
         log.Fatal(err)
     }
     return response
+}
+
+func (c Client) makeEndpoint(parts []string) string {
+    base := []string{
+        API_ROOT,
+        API_VERSION,
+    }
+    parts = append(base, parts...)
+    return strings.Join(parts, "/")
 }
 
 func (c Client) Query(parts []string) string {
