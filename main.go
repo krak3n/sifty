@@ -10,11 +10,13 @@ import (
     "flag"
     "log"
 
-    "github.com/krak3n/sifty/datasift"
+    "sifty/datasift"
 )
 
-var user = flag.String("user", "", "Your datasift user name")
-var key = flag.String("key", "", "Your datasift api key")
+var (
+    user = flag.String("user", "", "Your datasift user name")
+    key  = flag.String("key", "", "Your datasift api key")
+)
 
 func main() {
 
@@ -28,7 +30,7 @@ func main() {
     (*client).User = *user
     (*client).Key = *key
 
-    query := datasift.Query(credentials, datasift.BuildEndpoint(endpoint))
+    query := client.Query(endpoint)
 
     log.Printf(query)
 
