@@ -40,9 +40,9 @@ func (c Client) addHttpHeaders(request *http.Request) *http.Request {
     return request
 }
 
-func (c Client) request(url string) *http.Response {
+func (c Client) request(endpoint string) *http.Response {
     client := &http.Client{}
-    request, err := http.NewRequest("GET", url, nil)
+    request, err := http.NewRequest("GET", endpoint, nil)
     if err != nil {
         log.Fatal(err)
     }
