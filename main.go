@@ -10,7 +10,7 @@ import (
     "flag"
     "log"
 
-    "sifty/datasift"
+    "github.com/krak3n/sifty/datasift"
 )
 
 var user = flag.String("user", "", "Your datasift user name")
