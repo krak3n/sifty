@@ -6,27 +6,44 @@
 
 package datasift
 
-import "testing"
+import (
+    "testing"
 
-func TestAuthorizationHeaderValue(t *testing.T) {
-    client := &Client{
+    "github.com/stretchr/testify/assert"
+    "github.com/stretchr/testify/suite"
+)
+
+// Client Test Suite
+type ClientTestSuite struct {
+    suite.Suite
+    client *Client
+}
+
+// Setup Client Test Suite with a basic Client struct
+// with fake api credentials
+func (suite *ClientTestSuite) SetupTest() {
+    suite.client = &Client{
         "foo",
         "bar",
-    }
-    value := client.authorizationHeaderValue()
-    if value != "foo:bar" {
-        t.Errorf("Expected foo:bar, got %v", value)
     }
 }
 
-func TestMakeEndpoint(t *testing.T) {
-    client := &Client{
-        "foo",
-        "bar",
-    }
-    endpoint := client.makeEndpoint([]string{"foo", "bar"})
+// Ensure correct authorization header values are returned
+func (suite *ClientTestSuite) TestAuthorizationHeaderValue() {
+    value := suite.client.authorizationHeaderValue()
+
+    assert.Equal(suite.T(), value, "foo:bar")
+}
+
+// Ensure correct API endpoint is returned
+func (suite *ClientTestSuite) TestMakeEndpoint() {
+    endpoint := suite.client.makeEndpoint([]string{"foo", "bar"})
     expected := "https://api.datasift.com/v1/foo/bar"
-    if endpoint != expected {
-        t.Errorf("Expected %v, got %v", expected, endpoint)
-    }
+
+    assert.Equal(suite.T(), endpoint, expected)
+}
+
+// Client Test Suite Runner
+func TestClientTestSuite(t *testing.T) {
+    suite.Run(t, new(ClientTestSuite))
 }

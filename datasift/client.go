@@ -31,13 +31,13 @@ func (c Client) authorizationHeaderValue() (value string) {
     return strings.Join(credentials, ":")
 }
 
-func (c Client) addHttpHeaders(request *http.Request) *http.Request {
-    headers := make(map[string]string)
-    headers["Authorization"] = c.authorizationHeaderValue()
-    for key, value := range headers {
-        request.Header.Add(key, value)
+func (c Client) makeEndpoint(parts []string) string {
+    base := []string{
+        API_ROOT,
+        API_VERSION,
     }
-    return request
+    parts = append(base, parts...)
+    return strings.Join(parts, "/")
 }
 
 func (c Client) request(endpoint string) *http.Response {
@@ -46,21 +46,12 @@ func (c Client) request(endpoint string) *http.Response {
     if err != nil {
         log.Fatal(err)
     }
-    request = c.addHttpHeaders(request)
+    request.Header.Add("Authorization", c.authorizationHeaderValue())
     response, err := client.Do(request)
     if err != nil {
         log.Fatal(err)
     }
     return response
-}
-
-func (c Client) makeEndpoint(parts []string) string {
-    base := []string{
-        API_ROOT,
-        API_VERSION,
-    }
-    parts = append(base, parts...)
-    return strings.Join(parts, "/")
 }
 
 func (c Client) Query(parts []string) string {
