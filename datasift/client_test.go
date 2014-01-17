@@ -13,6 +13,10 @@ import (
     "github.com/stretchr/testify/suite"
 )
 
+/*
+ * Test Suite Setup
+ */
+
 // Client Test Suite
 type ClientTestSuite struct {
     suite.Suite
@@ -27,6 +31,10 @@ func (suite *ClientTestSuite) SetupTest() {
         "bar",
     }
 }
+
+/*
+ * Tests
+ */
 
 // Ensure correct authorization header values are returned
 func (suite *ClientTestSuite) TestAuthorizationHeaderValue() {
@@ -43,7 +51,10 @@ func (suite *ClientTestSuite) TestMakeEndpoint() {
     assert.Equal(suite.T(), endpoint, expected)
 }
 
-// Client Test Suite Runner
+/*
+ * Test Suite Runner
+ */
+
 func TestClientTestSuite(t *testing.T) {
     suite.Run(t, new(ClientTestSuite))
 }
