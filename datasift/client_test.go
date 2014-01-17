@@ -7,6 +7,9 @@
 package datasift
 
 import (
+    "fmt"
+    "net/http"
+    "net/http/httptest"
     "testing"
 
     "github.com/stretchr/testify/assert"
@@ -20,16 +23,39 @@ import (
 // Client Test Suite
 type ClientTestSuite struct {
     suite.Suite
-    client *Client
+
+    client  *Client
+    headers *map[string]string
 }
 
-// Setup Client Test Suite with a basic Client struct
-// with fake api credentials
+// Setup Client Test Suite
 func (suite *ClientTestSuite) SetupTest() {
+    // Client with fake API Credentials
     suite.client = &Client{
         "foo",
         "bar",
     }
+    // Test http server default headers
+    suite.headers = &map[string]string{
+        "Content-Type": "application/json",
+    }
+}
+
+// A HTTP Test Server for use when requesting the Datasift API to fake
+// responses from the API
+func (suite *ClientTestSuite) HttpTestServer(
+    body string,
+    headers *map[string]string) *httptest.Server {
+
+    handler := func(w http.ResponseWriter, r *http.Request) {
+        for key, value := range *suite.headers {
+            w.Header().Set(key, value)
+        }
+        fmt.Fprintln(w, body)
+    }
+    server := httptest.NewServer(http.HandlerFunc(handler))
+
+    return server
 }
 
 /*
@@ -49,6 +75,14 @@ func (suite *ClientTestSuite) TestMakeEndpoint() {
     expected := "https://api.datasift.com/v1/foo/bar"
 
     assert.Equal(suite.T(), endpoint, expected)
+}
+
+func (suite *ClientTestSuite) TestSuccessfulRequest() {
+    ts := suite.HttpTestServer(`{"foo": "bar"}`, suite.headers)
+    defer ts.Close()
+    response := suite.client.request(ts.URL)
+
+    assert.IsType(suite.T(), &http.Response{}, response)
 }
 
 /*
