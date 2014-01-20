@@ -9,6 +9,7 @@ import (
     "net/url"
     "testing"
 
+    "github.com/stretchr/testify/assert"
     "github.com/stretchr/testify/suite"
 )
 
@@ -25,30 +26,39 @@ type DatasiftTestSuite struct {
 }
 
 // Setup Client Test Suite
-func (suite *DatasiftTestSuite) SetupTest() {
+func (s *DatasiftTestSuite) SetupTest() {
     // Create our fake HTTP server
-    suite.mux = http.NewServeMux()
-    suite.server = httptest.NewServer(suite.mux)
-    suite.client = NewClient(nil)
+    s.mux = http.NewServeMux()
+    s.server = httptest.NewServer(s.mux)
+    s.client = NewClient(nil)
 
     // Override the client API Root to use the
     // HTTP test serves URL
-    url, _ := url.Parse(suite.server.URL)
-    suite.client.APIRoot = url
+    url, _ := url.Parse(s.server.URL)
+    s.client.APIRoot = url
 }
 
 /*
    Tests
 */
 
-func (suite *DatasiftTestSuite) TestAPIResponse() {
-    suite.mux.HandleFunc("/push/get", func(w http.ResponseWriter, r *http.Request) {
+func (s *DatasiftTestSuite) TestAuthroizationHeaderValue() {
+    c := &Client{
+        User: "foo",
+        Key:  "bar",
+    }
+
+    assert.Equal(s.T(), c.authorizationHeaderValue(), "foo:bar")
+}
+
+func (s *DatasiftTestSuite) TestAPIResponse() {
+    s.mux.HandleFunc("/push/get", func(w http.ResponseWriter, r *http.Request) {
         fmt.Fprint(w, `{"id":1}`)
     })
 
-    req, _ := suite.client.Request("GET", "push/get")
+    req, _ := s.client.Request("GET", "push/get")
 
-    response, _ := suite.client.Client.Do(req)
+    response, _ := s.client.Client.Do(req)
     defer response.Body.Close()
 
     body, _ := ioutil.ReadAll(response.Body)
