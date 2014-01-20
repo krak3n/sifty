@@ -5,9 +5,8 @@ go:
 
 install:
   - go get github.com/stretchr/testify
-  - go get github.com/axw/gocov/gocov
 
-script: go test -v ./... -cover
+script: go test -v ./...
 
 notifications:
   email: false
