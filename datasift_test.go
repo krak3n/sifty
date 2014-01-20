@@ -51,6 +51,12 @@ func (s *DatasiftTestSuite) TestAuthroizationHeaderValue() {
     assert.Equal(s.T(), c.authorizationHeaderValue(), "foo:bar")
 }
 
+func (s *DatasiftTestSuite) TestRequestInvalidURl() {
+    _, err := s.client.Request("GET", ":")
+
+    assert.NotEqual(s.T(), err, nil)
+}
+
 func (s *DatasiftTestSuite) TestAPIResponse() {
     s.mux.HandleFunc("/push/get", func(w http.ResponseWriter, r *http.Request) {
         fmt.Fprint(w, `{"id":1}`)
