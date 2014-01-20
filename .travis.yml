@@ -5,8 +5,13 @@ go:
 
 install:
   - go get github.com/stretchr/testify
+  - go get code.google.com/p/go.tools/cmd/cover
+  - go get github.com/mattn/goveralls
 
-script: go test -v ./...
+script:
+  - go test -covermode=count -coverprofile=cov.out
+  - export PATH=$PATH:$HOME/gopath/bin/
+  - goveralls -coverprofile=cov.out KEd1CyoPaES4IYrEln6whRTHwijssIMaT
 
 notifications:
   email: false
