@@ -1,6 +1,7 @@
 package datasift
 
 import (
+    "fmt"
     "net/http"
     "net/url"
     "strings"
@@ -32,7 +33,7 @@ type Client struct {
 }
 
 // Return a new Datasift API Client.
-func NewClient(httpClient *http.Client) *Client {
+func NewClient(user string, key string, httpClient *http.Client) *Client {
 
     if httpClient == nil {
         httpClient = http.DefaultClient
@@ -44,8 +45,10 @@ func NewClient(httpClient *http.Client) *Client {
     // Create a new Datasift Client
     client := &Client{
         APIRoot:   apiRoot,
-        UserAgent: userAgent,
         Client:    httpClient,
+        UserAgent: userAgent,
+        User:      user,
+        Key:       key,
     }
 
     return client
@@ -75,11 +78,12 @@ func (c *Client) Request(method string, endpoint string) (*http.Request, error) 
     // Build absolute URL using the url reference above with the API root as the base
     e := c.APIRoot.ResolveReference(rel)
 
-    // Create a new HTTP Request object
-    req, err := http.NewRequest(method, e.String(), nil)
-    if err != nil {
-        return nil, err
-    }
+    fmt.Println(e.String())
+
+    // Create a new HTTP Request object, we don't care about the error
+    // as we have already sanitized the url, http.NewRequest only
+    // errors on url.Parse erros
+    req, _ := http.NewRequest(method, e.String(), nil)
 
     // Add required HTTP headers to request
     req.Header.Add("User-Agent", c.UserAgent)
@@ -87,4 +91,34 @@ func (c *Client) Request(method string, endpoint string) (*http.Request, error) 
     req.Header.Add("Connection", "keep-alive")
 
     return req, nil
+}
+
+// Response queries the API and returns the API's respinse.
+func (c *Client) Response(req *http.Request) (*http.Response, error) {
+
+    // Get response from API
+    response, err := c.Client.Do(req)
+    if err != nil {
+        return nil, err
+    }
+
+    return response, nil
+}
+
+func (c *Client) Get(endpoint string) (*http.Response, error) {
+
+    // Generate Request
+    request, err := c.Request("GET", endpoint)
+    if err != nil {
+        return nil, err
+    }
+
+    // Get the response
+    response, err := c.Response(request)
+    if err != nil {
+        return nil, err
+    }
+
+    return response, nil
+
 }

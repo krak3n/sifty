@@ -3,7 +3,6 @@ package datasift
 import (
     "fmt"
     "io/ioutil"
-    "log"
     "net/http"
     "net/http/httptest"
     "net/url"
@@ -30,7 +29,7 @@ func (s *DatasiftTestSuite) SetupTest() {
     // Create our fake HTTP server
     s.mux = http.NewServeMux()
     s.server = httptest.NewServer(s.mux)
-    s.client = NewClient(nil)
+    s.client = NewClient("foo", "bar", nil)
 
     // Override the client API Root to use the
     // HTTP test serves URL
@@ -68,7 +67,8 @@ func (s *DatasiftTestSuite) TestAPIResponse() {
     defer response.Body.Close()
 
     body, _ := ioutil.ReadAll(response.Body)
-    log.Printf(string(body[:]))
+
+    assert.Equal(s.T(), string(body[:]), `{"id":1}`)
 }
 
 /*
