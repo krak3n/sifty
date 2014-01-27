@@ -122,3 +122,8 @@ func (c *Client) Get(endpoint string) (*http.Response, error) {
     return response, nil
 
 }
+
+type ErrorResponse struct {
+    response *http.Response // Http Response
+    Error    string         `json:"error"` // The error message
+}
