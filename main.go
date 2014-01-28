@@ -5,7 +5,7 @@ import (
     "io/ioutil"
     "sifty/datasift"
 
-    "github.com/docopt/docopt.go"
+    "github.com/krak3n/docopt-go"
 )
 
 const usage = `
