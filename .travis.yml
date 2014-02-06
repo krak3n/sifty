@@ -6,8 +6,5 @@ go:
 install:
   - go get github.com/stretchr/testify
 
-script:
-  - go test -v
-
 notifications:
   email: false

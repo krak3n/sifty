@@ -1,7 +1,9 @@
 package datasift
 
 import (
+    "encoding/json"
     "fmt"
+    "io/ioutil"
     "net/http"
     "net/url"
     "strings"
@@ -13,6 +15,22 @@ const (
     defaultAPIRoot = "https://api.datasift.com/v1/"
     userAgent      = "sifty/" + version
 )
+
+// Error response representation
+type ErrorResponse struct {
+    Response *http.Response // Http Response
+    Message  string         `json:"error"` // The error message
+}
+
+func (r *ErrorResponse) Error() string {
+    return fmt.Sprintf(
+        "%v %v: %d %v",
+        r.Response.Request.Method,
+        r.Response.Request.URL,
+        r.Response.StatusCode,
+        r.Message,
+    )
+}
 
 // Client which handles HTTP requests to the Datasift API
 type Client struct {
@@ -78,8 +96,6 @@ func (c *Client) Request(method string, endpoint string) (*http.Request, error) 
     // Build absolute URL using the url reference above with the API root as the base
     e := c.APIRoot.ResolveReference(rel)
 
-    fmt.Println(e.String())
-
     // Create a new HTTP Request object, we don't care about the error
     // as we have already sanitized the url, http.NewRequest only
     // errors on url.Parse erros
@@ -102,7 +118,34 @@ func (c *Client) Response(req *http.Request) (*http.Response, error) {
         return nil, err
     }
 
+    // Validate the response from the API
+    err = c.ValidateResponse(response)
+    if err != nil {
+        return response, err
+    }
+
     return response, nil
+}
+
+// ValidateResponse enusres the response from the API is a valid one.
+// For example if authentication fails Datasifts API will just respond
+// with a simple {"error": "the messsage"} json object.
+func (c *Client) ValidateResponse(r *http.Response) error {
+    // Did we get a valid status code
+    if status := r.StatusCode; 200 <= status && status <= 299 {
+        return nil
+    }
+    // Create an error response
+    errorResponse := &ErrorResponse{Response: r}
+    // Read the response body
+    data, err := ioutil.ReadAll(r.Body)
+    // If we have data and no error, load the json into the
+    // errorResponse
+    if err == nil && data != nil {
+        json.Unmarshal(data, errorResponse)
+    }
+
+    return errorResponse
 }
 
 func (c *Client) Get(endpoint string) (*http.Response, error) {
@@ -121,9 +164,4 @@ func (c *Client) Get(endpoint string) (*http.Response, error) {
 
     return response, nil
 
-}
-
-type ErrorResponse struct {
-    response *http.Response // Http Response
-    Error    string         `json:"error"` // The error message
 }
